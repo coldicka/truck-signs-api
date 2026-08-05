@@ -86,8 +86,8 @@ The Docker setup consists of three containers:
 | Container | Image / Application | Purpose |
 |---|---|---|
 | `db` | `postgres:16-alpine` | PostgreSQL database |
-| `django_web` | `truck_signs_api` | Django REST API |
-| `nginx` | `nginx:alpine` | Reverse proxy and static/media delivery |
+| `tsa_backend` | `backend` | Django REST API |
+| `tsa_nginx` | `nginx:alpine` | Reverse proxy and static/media delivery |
 
 ---
 
