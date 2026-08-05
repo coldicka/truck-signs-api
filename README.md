@@ -1,238 +1,310 @@
 <div align="center">
 
-# Signs for Trucks
-
-![Python version](https://img.shields.io/badge/Python-3.12.0-4c566a?logo=python&&longCache=true&logoColor=white&colorB=pink&style=flat-square&colorA=4c566a) ![Django version](https://img.shields.io/badge/Django-5.2.8-4c566a?logo=django&&longCache=truelogoColor=white&colorB=pink&style=flat-square&colorA=4c566a) ![Django-RestFramework](https://img.shields.io/badge/Django_Rest_Framework-3.16.1-red.svg?longCache=true&style=flat-square&logo=django&logoColor=white&colorA=4c566a&colorB=pink)
-
 ![Truck Signs](./src/screenshots/Truck_Signs_logo.png)
 
-__Signs for Trucks__ is an online store to buy pre-designed vinyls with custom lines of letters (often call truck letterings).
-The store also allows clients to upload their own designs and to customize them on the website as well.
+# Signs for Trucks
+
+![Python version](https://img.shields.io/badge/Python-3.14.4-4c566a?logo=python&&longCache=true&logoColor=white&colorB=pink&style=flat-square&colorA=4c566a) ![Django version](https://img.shields.io/badge/Django-5.2.8-4c566a?logo=django&&longCache=true&logoColor=white&colorB=pink&style=flat-square&colorA=4c566a) ![Django-RestFramework](https://img.shields.io/badge/Django_Rest_Framework-3.16.1-red.svg?longCache=true&style=flat-square&logo=django&logoColor=white&colorA=4c566a&colorB=pink)
 
 </div>
 
+A Dockerized **Django REST API** for managing truck sign products, categories, customer orders, and payments, backed by **PostgreSQL**.
+
+The production setup uses **Nginx** as a reverse proxy/static-file server and **Gunicorn** as the WSGI application server.
+
+> **Note:** This project is currently managed only with Docker Compose.
+
+---
+
 ## Table of Contents
 
-- [Signs for Trucks](#signs-for-trucks)
-  - [Table of Contents](#table-of-contents)
-  - [Prerequisites](#prerequisites)
-  - [Quickstart](#quickstart)
-  - [Usage](#usage)
-    - [Settings](#settings)
-    - [Models](#models)
-    - [Brief Explanation of the Views](#brief-explanation-of-the-views)
-    - [Installation](#installation)
-  - [Screenshots of the Django Backend Admin Panel](#screenshots-of-the-django-backend-admin-panel)
-    - [Mobile View](#mobile-view)
-    - [Desktop View](#desktop-view)
-  - [Additional Information](#additional-information)
-    - [Postgresql Database](#postgresql-database)
-    - [Docker](#docker)
-    - [Django and DRF](#django-and-drf)
-    - [Miscellaneous](#miscellaneous)
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Domain Models](#domain-models)
+- [Views & API Behavior](#views--api-behavior)
+- [Requirements](#requirements)
+- [Quick Start](#quick-start)
+  - [1. Clone the repository](#1-clone-the-repository)
+  - [2. Configure environment variables](#2-configure-environment-variables)
+  - [3. Build the Docker image](#3-build-the-docker-image)
+  - [4. Check the logs](#4-check-the-logs)
+- [Available URLs](#available-urls)
+- [Configuration](#configuration)
+- [Important Product Setup Note](#important-product-setup-note)
+- [Screenshots](#screenshots)
+- [Useful Links](#useful-links)
 
-## Prerequisites
+---
 
-* [Python 3.12.0](https://www.python.org/downloads/release/python-3120/)
-* [Git](https://git-scm.com/install/)
+## Overview
 
-## Quickstart
+**Signs for Trucks** is an online store for pre-designed vinyls with customizable lettering.
 
-1. Clone the repo:
+Customers can:
+
+- purchase pre-designed truck vinyls;
+- customize lettering directly on the website;
+- upload their own designs;
+- purchase simple lettering vinyls without a truck logo;
+- purchase fire-extinguisher vinyls;
+- purchase vinyls containing a truck unit number or another custom number.
+
+The repository also contains the backend configuration and Docker setup required to run the Django application with PostgreSQL, Gunicorn, and Nginx.
+
+---
+
+## Architecture
+
+```text
+                         ┌──────────────────┐
+                         │      Client      │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │      Nginx       │
+                         │  Reverse Proxy   │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │ Django REST API  │
+                         │     Gunicorn     │
+                         └────────┬─────────┘
+                                  │
+                         ┌────────┴─────────┐
+                         ▼                  ▼
+                ┌────────────────┐  ┌────────────────┐
+                │   PostgreSQL   │  │ Static / Media │
+                │       DB       │  │     Volumes    │
+                └────────────────┘  └────────────────┘
+```
+
+The Docker setup consists of three containers:
+
+| Container | Image / Application | Purpose |
+|---|---|---|
+| `db` | `postgres:16-alpine` | PostgreSQL database |
+| `django_web` | `truck_signs_api` | Django REST API |
+| `nginx` | `nginx:alpine` | Reverse proxy and static/media delivery |
+
+---
+
+## Project Structure
+
+Important project components include:
+
+- `trucks_signs_api_app (tsa_app)/settings` — environment-specific Django settings.
+- `Dockerfile` — builds the Django application image.
+- `requirements.txt` — Python dependencies.
+- `nginx.conf` — Nginx configuration mounted into the Nginx container.
+- `entrypoint.sh` — prepares the Django application when the container starts.
+- `.env` — runtime configuration and sensitive environment variables.
+- `.gitignore` — prevents sensitive and generated files from being committed.
+- `.dockerignore` — reduces the Docker build context.
+
+---
+
+## Domain Models
+
+The main models are:
+
+| Model | Purpose |
+|---|---|
+| **Category** | Defines a product category and shared properties for products in that category. |
+| **Lettering Item Category** | Defines lettering types such as `Company Name` or `VIM NUMBER`, including their pricing. |
+| **Lettering Item Variations** | Stores a lettering category together with the text entered by the customer. |
+| **Product Variation** | Connects an original product with the lettering variations selected by the customer. |
+| **Order** | Stores the purchased vinyl together with customer contact and shipping information. |
+| **Payment** | Stores payment-related information such as purchase time and the Stripe customer ID. |
+
+### Payments
+
+The intended payment gateway is **Stripe**.
+
+> **Important:** The payment implementation is currently missing because this repository is intended for documentation and testing purposes.
+
+---
+
+## Views & API Behavior
+
+Most views use Django REST Framework generic class-based views from `rest_framework.generics`, such as:
+
+- `ListAPIView`
+- `CreateAPIView`
+- `RetrieveAPIView`
+- and related generic API views
+
+Some workflows require custom behavior and therefore use a more flexible `GenericAPIView`.
+
+For example:
+
+- **Order and payment creation** are handled together in one workflow.
+- **`UploadCustomerImage`** accepts a customer-uploaded vinyl template and creates a new product from it.
+
+---
+
+# Quick Start
+
+## Requirements
+
+Make sure the following are installed:
+
+- [Docker](https://docs.docker.com/) **20.10 or higher**
+- Git
+
+---
+
+## 1. Clone the repository
+
 ```bash
-git clone git@github.com:Developer-Akademie-DevSecOpsKurs/truck-signs-api.git
+git clone git@github.com:coldicka/truck-signs-api.git
 cd truck-signs-api
 ```
 
-2. Copy the content of the example.env file into a .env file:
+---
+
+## 2. Configure environment variables
+
+Copy the example environment file:
+
 ```bash
 cp example.env .env
 ```
 
-3. Create virtual environment:
+Then fill in the required values.
+
+### Environment variables
+
+| Variable | Example | Description |
+|---|---|---|
+| `SECRET_KEY` | `gG7Zrz4FR...` | Django secret key |
+| `DB_NAME` | `trucksigns_db` | PostgreSQL database name |
+| `DB_USER` | `trucksigns_user` | PostgreSQL username |
+| `DB_PASSWORD` | `Your_Secure_Password!` | PostgreSQL password |
+| `DB_HOST` | `db` | Database container hostname - It's best to leave the name as is. It matches the name of your service in the docker-compose.yml file. |
+| `DB_PORT` | `5432` | PostgreSQL port |
+| `DJANGO_SUPERUSER_USERNAME` | `admin` | Automatically created superuser username |
+| `DJANGO_SUPERUSER_EMAIL` | `admin@example.com` | Automatically created superuser email |
+| `DJANGO_SUPERUSER_PASSWORD` | `Your_Secure_Password!` | Automatically created superuser password |
+| `ALLOWED_HOSTS` | `localhost,127.0.0.1,YOUR_IP,tsa-backend` | Allowed Hosts for the Django Application |
+| `CSRF_TRUSTED_ORIGINS` | `http://localhost:8040,http://127.0.0.1:8040,YOUR_IP:8040` |  |
+
+### Generate a secure Django secret key
+
 ```bash
-python -m venv <venv_name>
+python -c "import secrets; print(secrets.token_urlsafe(50))"
 ```
 
-4. Activate virtual environment:
-```bash
-source <venv_name>/scripts/activate
-```
-
-5. Install requirements:
-```bash
-pip install -r requirements.txt
-```
-
-6. Migrate database:
-```bash
-python src/manage.py makemigrations
-python src/manage.py migrate
-```
-
-7. Collect static files:
-```bash
-python src/manage.py collectstatic
-```
-
-8. Start the Python Development Server:
-```bash
-python src/manage.py runserver
-```
-
-## Usage
-
-### Settings
-
-The `settings.py` folder inside the `src/tsa_app` folder contains the different settings configuration for the application.
-
-The `example.env` file in the project root contains an overview about configuration values that can be set for the app.
-
-### Control Application Settings via Env-Variables
-
-You can provide all configuration via a `.env` file in the project root.
-Copy `example.env` to `.env`, fill in the required values (DB, SECRET_KEY, etc.), and keep this file out of version 
-control to avoid leaking secrets.
-
-**Database switch via MODE**
-- `MODE=prod` -> PostgreSQL, using `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` from `.env`.
-- `MODE` unset or `MODE=dev` -> SQLite at `src/db.sqlite3`; no DB env vars needed.
-
-### Models
-
-Most of the models do what can be inferred from their name. The following dots are notes about some of the models to make clearer their propose:
-- __Category Model:__ The category of the vinyls in the store. It contains the title of the category as well as the basic properties shared among products that belong to a same category. For example, _Truck Logo_ is a category for all vinyls that has a logo of a truck plus some lines of letterings (note that the vinyls are instances of the model _Product_). Another category is _Fire Extinguisher_, that is for all vinyls that has a logo of a fire extinguisher.
-- __Lettering Item Category:__ This is the category of the lettering, for example: _Company Name_, _VIM NUMBER_, ... Each has a different pricing.
-- __Lettering Item Variations:__ This contains a foreign key to the __Lettering Item Category__ and the text added by the client.
-- __Product Variation:__ This model has the original product as a foreign key, plus the lettering lines (instances of the __Lettering Item Variations__ model) added by the client.
-
-### Brief Explanation of the Views
-
-Most of the views are CBV imported from _rest_framework.generics_, and they allow the backend api to do the basic CRUD operations expected, and so they inherit from the _ListAPIView_, _CreateAPIView_, _RetrieveAPIView_, ..., and so on.
-
-The behavior of some of the views had to be modified to address functionalities such as creation of order and payment, as in this case, for example, both functionalities are implemented in the same view, and so a _GenericAPIView_ was the view from which it inherits. Another example of this is the _UploadCustomerImage_ View that takes the vinyl template uploaded by the clients and creates a new product based on it.
-
-### Installation
-
-1. Clone the repo:
-    ```bash
-    git clone <INSERT URL>
-    cd truck-signs-api
-    ```
-1. Configure a virtual env
-    ```bash
-    python -m venv venv
-    venv\Scripts\activate
-    ```
-1. Configure the environment variables.
-    1. Copy the content of the `example.env` file that is on projects root level into a `.env` file:
-        ```bash
-        cp example.env .env
-        ```
-    2. The new `.env` file should contain all the environment variables necessary to run all the django app in all the environments. However, the only needed variables for the development environment to run are the following:
-        ```bash
-        SECRET_KEY
-        DB_NAME
-        DB_USER
-        DB_PASSWORD
-        DB_HOST
-        DB_PORT
-        EMAIL_HOST_USER
-        EMAIL_HOST_PASSWORD
-        ```
-    3. For the `postgres` database, the default configuration should be:
-        ```bash
-        DB_NAME=trucksigns_db
-        DB_USER=trucksigns_user
-        DB_PASSWORD=supertrucksignsuser!
-        DB_HOST=localhost
-        DB_PORT=5432
-        ```
-    4. The SECRET_KEY is the django secret key. To generate a new one see: [Stackoverflow Link](https://stackoverflow.com/questions/41298963/is-there-a-function-for-generating-settings-secret-key-in-django)
-
-    5. The `EMAIL_HOST_USER` and the `EMAIL_HOST_PASSWORD` are the credentials to send emails from the website when a client makes a purchase. This is currently disable, but the code to activate this can be found in views.py in the create order view as comments. Therefore, any valid email and password will work.
-1. Run the migrations:
-    ```bash
-    python src/manage.py makemigrations
-    python src/manage.py migrate
-    ```
-1. Collect static files:
-    ```bash
-    python src/manage.py collectstatic
-    ```
-1. Run the app:
-    ```bash
-    python src/manage.py runserver
-    ```
-1. (Optional step) To create a super user run:
-    ```bash
-    python src/manage.py createsuperuser
-    ```
-1. (Optional step) Set up the database. [Django database setup example](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-16-04).
-
-Congratulations =) !!! The App should be running in [localhost:8000](http://localhost:8000)
-
-> [!NOTE]
-> To create Truck vinyls with Truck logos in them, first create the __Category__ Truck Sign,
-> and then the __Product__ (can have any name). This is to make sure the frontend retrieves
-> the Truck vinyls for display in the Product Grid as it only fetches the products of the
-> category Truck Sign.
+> [!CAUTION]
+> **Never commit `.env` to version control.** Make sure it is listed in `.gitignore`.
 
 ---
 
-## Screenshots of the Django Backend Admin Panel
+## 3. Build the Docker image
 
-### Mobile View
+Run this from the project root:
 
-<div style="padding: 0 5rem; width: 100%;  display: flex; gap: 5rem; justify-content: center; flex-wrap: wrap;">
+```bash
+docker-compose build
+docker-compose up -d
+```
 
-![alt text](./src/screenshots/Admin_Panel_View_Mobile.png)
+This will start all you need for this project: network, database, django, nginx
 
-![alt text](./src/screenshots/Admin_Panel_View_Mobile_2.png)
+---
 
-![alt text](./src/screenshots/Admin_Panel_View_Mobile_3.png)
+## 4. Check the logs
+
+```bash
+docker logs django_web
+docker logs nginx
+docker logs db
+```
+
+---
+
+## Available URLs
+
+After the containers are running:
+
+### Django Admin
+
+```text
+http://<YOUR_IP>:8040/admin
+```
+
+---
+
+# Configuration
+
+The application is configured through `.env`.
+
+The `Dockerfile` uses `python:3.12-slim` as the base image for the Django backend and installs dependencies from `requirements.txt`.
+
+PostgreSQL is provided by the official `postgres:16-alpine` image.
+
+Nginx uses the `nginx.conf` file from the project root, mounted into the container as a bind mount.
+
+The `.gitignore` excludes temporary files, sensitive data, and generated content from Git. The `.dockerignore` excludes unnecessary files from the Docker build context to keep builds smaller and faster.
+
+---
+
+# Important Product Setup Note
+
+> [!IMPORTANT]
+> To create truck vinyls containing truck logos, first create the **`Truck Sign`** category and then create the **Product**.
+>
+> The frontend retrieves truck vinyls for the Product Grid based on this category.
+
+---
+
+# Screenshots
+
+## Django Admin — Mobile
+
+<div align="center">
+
+![Django Admin Mobile](./images/Admin_Panel_View_Mobile.png) ![Django Admin Mobile 2](./images/Admin_Panel_View_Mobile_2.png) ![Django Admin Mobile 3](./images/Admin_Panel_View_Mobile_3.png)
+
 
 </div>
 
-### Desktop View
+## Django Admin — Desktop
 
+![Django Admin](./images/Admin_Panel_View.png)
 
-<div style="padding: 0 5rem; width: 100%; display: flex; flex-direction: column; gap: 2rem; align-items: center; justify-content: center;">
+![Django Admin 2](./images/Admin_Panel_View_2.png)
 
-![alt text](./src/screenshots/Admin_Panel_View.png)
+![Django Admin 3](./images/Admin_Panel_View_3.png)
 
-![alt text](./src/screenshots/Admin_Panel_View_2.png)
+---
 
-![alt text](./src/screenshots/Admin_Panel_View_3.png)
+# Useful Links
 
-</div>
+## PostgreSQL
 
-## Additional Information
+- [DigitalOcean — Django with PostgreSQL, Nginx and Gunicorn](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-16-04)
 
-### Postgresql Database
+## Docker
 
-- Setup Database: [Digital Ocean Link for Django Deployment on VPS](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-16-04)
+- [Docker Official Documentation](https://docs.docker.com/)
+- [Dockerized Django + PostgreSQL + Gunicorn + Nginx — GitHub](https://github.com/sunilale0/django-postgresql-gunicorn-nginx-dockerized/blob/master/README.md#nginx)
+- [Dockerizing Django with PostgreSQL, Gunicorn and Nginx — TestDriven.io](https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/)
 
-### Docker
+## Django & Django REST Framework
 
-- [Docker Oficial Documentation](https://docs.docker.com/)
-- Dockerizing Django, PostgreSQL, guinicorn, and Nginx:
-    - Github repo of sunilale0: [Link](https://github.com/sunilale0/django-postgresql-gunicorn-nginx-dockerized/blob/master/README.md#nginx)
-    - Michael Herman article on testdriven.io: [Link](https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/)
+- [Django Documentation](https://docs.djangoproject.com/en/4.0/)
+- [Django REST Framework Documentation](https://www.django-rest-framework.org/)
+- [Generating a Django Secret Key — Stack Overflow](https://stackoverflow.com/questions/41298963/is-there-a-function-for-generating-settings-secret-key-in-django)
+- [Customizing Django Admin — Real Python](https://realpython.com/customize-django-admin-python/)
+- [Customizing Django Admin Templates & CSS — Medium](https://medium.com/@brianmayrose/django-step-9-180d04a4152c)
+- [Nested Serializers — Stack Overflow](https://stackoverflow.com/questions/51182823/django-rest-framework-nested-serializers)
+- [DRF Generic Views — TestDriven.io](https://testdriven.io/blog/drf-views-part-2/)
 
-### Django and DRF
+## Miscellaneous
 
-- [Django Official Documentation](https://docs.djangoproject.com/en/5.2/)
-- Generate a new secret key: [Stackoverflow Link](https://stackoverflow.com/questions/41298963/is-there-a-function-for-generating-settings-secret-key-in-django)
-- Modify the Django Admin:
-    - Small modifications (add searching, columns, ...): [Link](https://realpython.com/customize-django-admin-python/)
-    - Modify Templates and css: [Link from Medium](https://medium.com/@brianmayrose/django-step-9-180d04a4152c)
-- [Django Rest Framework Official Documentation](https://www.django-rest-framework.org/)
-- More about Nested Serializers: [Stackoverflow Link](https://stackoverflow.com/questions/51182823/django-rest-framework-nested-serializers)
-- More about GenericViews: [Testdriver.io Link](https://testdriven.io/blog/drf-views-part-2/)
-
-### Miscellaneous
-
-- Create Virual Environment with Virtualenv and Virtualenvwrapper: [Link](https://docs.python-guide.org/dev/virtualenvs/)
-- [Configure CORS](https://www.stackhawk.com/blog/django-cors-guide/)
-- [Setup Django with Cloudinary](https://cloudinary.com/documentation/django_integration)
+- [Virtualenv & Virtualenvwrapper — The Hitchhiker's Guide to Python](https://docs.python-guide.org/dev/virtualenvs/)
+- [Django CORS Guide — StackHawk](https://www.stackhawk.com/blog/django-cors-guide/)
+- [Django + Cloudinary Integration](https://cloudinary.com/documentation/django_integration)
