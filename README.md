@@ -145,9 +145,9 @@ For example:
 
 ---
 
-# Quick Start
+## Quick Start
 
-## Requirements
+### Requirements
 
 Make sure the following are installed:
 
@@ -156,7 +156,7 @@ Make sure the following are installed:
 
 ---
 
-## 1. Clone the repository
+### 1. Clone the repository
 
 ```bash
 git clone git@github.com:coldicka/truck-signs-api.git
@@ -165,7 +165,7 @@ cd truck-signs-api
 
 ---
 
-## 2. Configure environment variables
+### 2. Configure environment variables
 
 Copy the example environment file:
 
@@ -175,7 +175,7 @@ cp example.env .env
 
 Then fill in the required values.
 
-### Environment variables
+#### Environment variables
 
 | Variable | Example | Description |
 |---|---|---|
@@ -191,7 +191,7 @@ Then fill in the required values.
 | `ALLOWED_HOSTS` | `localhost,127.0.0.1,YOUR_IP,tsa-backend` | Allowed Hosts for the Django Application |
 | `CSRF_TRUSTED_ORIGINS` | `http://localhost:8040,http://127.0.0.1:8040,YOUR_IP:8040` |  |
 
-### Generate a secure Django secret key
+#### Generate a secure Django secret key
 
 ```bash
 python -c "import secrets; print(secrets.token_urlsafe(50))"
@@ -202,7 +202,7 @@ python -c "import secrets; print(secrets.token_urlsafe(50))"
 
 ---
 
-## 3. Build the Docker image
+### 3. Build the Docker image
 
 Run this from the project root:
 
@@ -215,7 +215,7 @@ This will start all you need for this project: network, database, django, nginx
 
 ---
 
-## 4. Check the logs
+### 4. Check the logs
 
 ```bash
 docker logs django_web
@@ -237,7 +237,7 @@ http://<YOUR_IP>:8040/admin
 
 ---
 
-# Configuration
+## Configuration
 
 The application is configured through `.env`.
 
@@ -251,7 +251,7 @@ The `.gitignore` excludes temporary files, sensitive data, and generated content
 
 ---
 
-# Important Product Setup Note
+## Important Product Setup Note
 
 > [!IMPORTANT]
 > To create truck vinyls containing truck logos, first create the **`Truck Sign`** category and then create the **Product**.
@@ -260,9 +260,9 @@ The `.gitignore` excludes temporary files, sensitive data, and generated content
 
 ---
 
-# Screenshots
+## Screenshots
 
-## Django Admin — Mobile
+### Django Admin — Mobile
 
 <div align="center">
 
@@ -271,7 +271,7 @@ The `.gitignore` excludes temporary files, sensitive data, and generated content
 
 </div>
 
-## Django Admin — Desktop
+### Django Admin — Desktop
 
 ![Django Admin](./images/Admin_Panel_View.png)
 
@@ -281,19 +281,19 @@ The `.gitignore` excludes temporary files, sensitive data, and generated content
 
 ---
 
-# Useful Links
+## Useful Links
 
-## PostgreSQL
+### PostgreSQL
 
 - [DigitalOcean — Django with PostgreSQL, Nginx and Gunicorn](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-16-04)
 
-## Docker
+### Docker
 
 - [Docker Official Documentation](https://docs.docker.com/)
 - [Dockerized Django + PostgreSQL + Gunicorn + Nginx — GitHub](https://github.com/sunilale0/django-postgresql-gunicorn-nginx-dockerized/blob/master/README.md#nginx)
 - [Dockerizing Django with PostgreSQL, Gunicorn and Nginx — TestDriven.io](https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/)
 
-## Django & Django REST Framework
+### Django & Django REST Framework
 
 - [Django Documentation](https://docs.djangoproject.com/en/4.0/)
 - [Django REST Framework Documentation](https://www.django-rest-framework.org/)
@@ -303,7 +303,7 @@ The `.gitignore` excludes temporary files, sensitive data, and generated content
 - [Nested Serializers — Stack Overflow](https://stackoverflow.com/questions/51182823/django-rest-framework-nested-serializers)
 - [DRF Generic Views — TestDriven.io](https://testdriven.io/blog/drf-views-part-2/)
 
-## Miscellaneous
+### Miscellaneous
 
 - [Virtualenv & Virtualenvwrapper — The Hitchhiker's Guide to Python](https://docs.python-guide.org/dev/virtualenvs/)
 - [Django CORS Guide — StackHawk](https://www.stackhawk.com/blog/django-cors-guide/)
