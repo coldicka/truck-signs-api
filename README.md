@@ -189,7 +189,7 @@ Then fill in the required values.
 | `DJANGO_SUPERUSER_EMAIL` | `admin@example.com` | Automatically created superuser email |
 | `DJANGO_SUPERUSER_PASSWORD` | `Your_Secure_Password!` | Automatically created superuser password |
 | `ALLOWED_HOSTS` | `localhost,127.0.0.1,YOUR_IP,tsa-backend` | Allowed Hosts for the Django Application |
-| `CSRF_TRUSTED_ORIGINS` | `http://localhost:8040,http://127.0.0.1:8040,YOUR_IP:8040` |  |
+| `CSRF_TRUSTED_ORIGINS` | `http://localhost:8040,http://127.0.0.1:8040,http://YOUR_IP:8040,https://YOUR_IP:8040` |  |
 
 #### Generate a secure Django secret key
 
