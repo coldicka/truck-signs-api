@@ -126,7 +126,20 @@ sqlite_config = {
 
 db_config = sqlite_config if MODE != "prod" else pg_config
 
-DATABASES = {"default": db_config}
+
+if os.environ.get('DB_NAME'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DB_NAME'),
+            'USER': os.environ.get('DB_USER'),
+            'PASSWORD': os.environ.get('DB_PASSWORD'),
+            'HOST': os.environ.get('DB_HOST', 'db'),
+            'PORT': os.environ.get('DB_PORT', '5432'),
+        }
+    }
+else:
+    DATABASES = {"default": db_config}
 
 AUTH_PASSWORD_VALIDATORS = [
     {

@@ -7,7 +7,7 @@ ARG _WORKDIR=/app
 WORKDIR ${_WORKDIR}
 
 # Default port for the app to start with
-ENV APP_PORT=8040
+ENV APP_PORT=8020
 
 # Prevents Python from writing pyc files
 ENV PYTHONDONTWRITEBYTECODE=1
