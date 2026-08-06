@@ -1,0 +1,64 @@
+# =========================
+# Git
+# =========================
+.git
+.gitignore
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# API Config (sensitive)
+**/api.config*.ts
+
+# =========================
+# Python / Django
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+venv/
+.venv/
+env/
+
+# Django runtime files
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# =========================
+# Build / Temp
+# =========================
+build/
+tmp/
+temp/
+
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# =========================
+# Tests / Coverage
+# =========================
+.coverage
+htmlcov/
+.pytest_cache/
+
+# =========================
+# Secrets
+# =========================
+.env
+.env.*
+!example.env
+
+*.pem
+*.key
+*.crt
+secrets.json
