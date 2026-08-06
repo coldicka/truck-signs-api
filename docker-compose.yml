@@ -52,8 +52,6 @@ services:
       CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS}
       # CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
     volumes:
-    # Enables live code updates during development:
-      - .:/app
     # Allows Django to write static and media files to the host
       - django_staticfiles:/app/src/staticfiles
       - django_mediafiles:/app/src/media
